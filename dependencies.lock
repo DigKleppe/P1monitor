@@ -1,0 +1,21 @@
+dependencies:
+  chmorgan/esp-libhelix-mp3:
+    component_hash: cbb76089dc2c5749f7b470e2e70aedc44c9da519e04eb9a67d4c7ec275229e53
+    source:
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.0.3
+  espressif__mdns:
+    component_hash: null
+    source:
+      path: /mnt/linuxData/projecten/ESP32IDF5/p1Monitor/components/espressif__mdns
+      type: local
+    version: 1.2.0
+  idf:
+    component_hash: null
+    source:
+      type: idf
+    version: 5.1.1
+manifest_hash: c45896b38559017d353facedcfcf2ec0267769833f2befbbd86b1f340f50dae3
+target: esp32
+version: 1.0.0
