@@ -1,11 +1,10 @@
-ESP-IDF template app
+P1 energymeter monitor
 ====================
 
-This is a template application to be used with [Espressif IoT Development Framework](https://github.com/espressif/esp-idf).
+Interface: pullup 1k to 3V3
+webserver with 1 hour and 1 day graph
+To connect: use ESPtouch V1 when LED is blinking.
 
-Please check [ESP-IDF docs](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for getting started instructions.
+NOT tested yet for use with 3 phases and solarpanels!
 
-*Code in this repository is in the Public Domain (or CC0 licensed, at your option.)
-Unless required by applicable law or agreed to in writing, this
-software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied.*
+

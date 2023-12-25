@@ -48,15 +48,11 @@ uint32_t upTime;
 void uartRxTask(void *arg);
 
 
-
-
-//socket creation failed: Too many open files in system
 extern "C" {
 void app_main() {
 	esp_err_t err;
 
 	bool toggle = false;
-//	getSensorNameScript(NULL, NULL);
 
 	esp_rom_gpio_pad_select_gpio(LED_PIN);
 	gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
