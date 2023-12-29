@@ -44,8 +44,6 @@
 
  1-0:22.7.0(00.000*kW)	// Instantaneous active power L1 (-P) in W resolution
 
- *	p1Buffer contents:
- * /ISK5\\2M550E-1013\r\n\r\n1-3:0.2.8(50)\r\n0-0:1.0.0(231022152205S)\r\n0-0:96.1.1(4530303533303038333837313934353231)\r\n1-0:1.8.1(000528.860*kWh)\r\n1-0:1.8.2(0005
  *
  */
 
@@ -75,9 +73,9 @@ p1Var_t p1VarTable[] = {
 	{ "1-0:21.7.0", "Actueel opgenomen vermogen L1",1},
 	{ "1-0:41.7.0", "Actueel opgenomen vermogen L2",1},
 	{ "1-0:61.7.0", "Actueel opgenomen vermogen L3",1},
-	{ "1-0:22.8.1", "Actueel geleverd vermogen L1",2},
-	{ "1-0:42.8.1", "Actueel geleverd vermogen L2",2},
-	{ "1-0:62.8.1", "Actueel geleverd vermogen L3",2},
+	{ "1-0:22.7.0", "Actueel geleverd vermogen L1",2},
+	{ "1-0:42.7.0", "Actueel geleverd vermogen L2",2},
+	{ "1-0:62.7.0", "Actueel geleverd vermogen L3",2},
 	{ "1-0:32.7.0", "Spanning L1",3},
 	{ "1-0:52.7.0", "Spanning L2",3},
 	{ "1-0:72.7.0", "Spanning L3",3},
@@ -87,7 +85,7 @@ p1Var_t p1VarTable[] = {
 	{ "1-0:2.8.2", 	"Geleverde energie tarief 2",0 },
 	{ "0-0:96.7.21","Korte onderbrekingen",0},
 	{ "0-0:96.7.9", "Lange onderbrekingen",0 },
-	{ "1-0:99.97.0", "Onderbrekingslog",4 },
+	{ "1-0:99.97.0","Onderbrekingslog",4 },
 	{ "", "",0 },
 #endif
 

@@ -34,10 +34,13 @@
 #include "wifiConnect.h"
 #include "settings.h"
 #include "main.h"
+#include "p1parser.h"
 
 #include "scripts.h"
 
 static const char *TAG = "main";
+
+//#define SIMULATE
 
 esp_err_t init_spiffs(void);
 
@@ -46,6 +49,7 @@ uint32_t stackWm[5];
 uint32_t upTime;
 
 void uartRxTask(void *arg);
+extern const char _3PhaseSimData[];
 
 
 extern "C" {
@@ -53,6 +57,7 @@ void app_main() {
 	esp_err_t err;
 
 	bool toggle = false;
+
 
 	esp_rom_gpio_pad_select_gpio(LED_PIN);
 	gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
@@ -85,11 +90,16 @@ void app_main() {
 		vTaskDelay(500 / portTICK_PERIOD_MS);
 	} while (connectStatus != IP_RECEIVED);
 
+	gpio_set_level(LED_PIN, 0);
+
 	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 
 	while (1) {
 		vTaskDelay(1000 / portTICK_PERIOD_MS);
 		upTime++;
+#ifdef SIMULATE
+		parseP1data( (char *)_3PhaseSimData, strlen((char *)_3PhaseSimData));
+#endif
 
 		if (connectStatus != IP_RECEIVED) {
 			toggle = !toggle;
