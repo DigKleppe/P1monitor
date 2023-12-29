@@ -16,9 +16,11 @@
 #include "soc/uart_reg.h"
 #include "crc16_table.h"
 #include "p1parser.h"
+#include "udpClient.h"
+#include "wifiConnect.h"
 
-static const int RX_BUF_SIZE = 1024;  // uart low level
-#define P1_BUF_SIZE			   1024   // result buffer
+static const int RX_BUF_SIZE = 2048;  // uart low level
+#define P1_BUF_SIZE			   2048   // result buffer
 
 #define TXD_PIN (GPIO_NUM_4)
 
@@ -30,7 +32,6 @@ static QueueHandle_t uart_queue;
 static char p1Buffer[P1_BUF_SIZE];
 volatile int mssgsReceived;
 volatile int CRCerrors;
-
 
 // @formatter:off
 static void uartInit(void) {
@@ -61,7 +62,7 @@ void uartRxTask(void *arg) {
 	static const char *RX_TASK_TAG = "uart RX_TASK";
 	esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
 	uint8_t state = 0;
-	int nrCharsInBuffer =0;
+	int nrCharsInBuffer = 0;
 	uart_event_t event;
 	uint8_t *dtmp = (uint8_t*) malloc(RX_BUF_SIZE + 1);
 	char *dest = p1Buffer;
@@ -70,26 +71,26 @@ void uartRxTask(void *arg) {
 	for (;;) {
 		if (xQueueReceive(uart_queue, (void*) &event, (TickType_t) portMAX_DELAY)) {
 			bzero(dtmp, RX_BUF_SIZE);
-	//		ESP_LOGI(RX_TASK_TAG, "uart[%d] event:", EX_UART_NUM);
+			//		ESP_LOGI(RX_TASK_TAG, "uart[%d] event:", EX_UART_NUM);
 			switch (event.type) {
 			//Event of UART receving data
 			/*We'd better handler data event fast, there would be much more data events than
 			 other types of events. If we take too much time on data event, the queue might
 			 be full.*/
 			case UART_DATA:
-		//		ESP_LOGI(RX_TASK_TAG, "[UART DATA]: %d", event.size);
+				//		ESP_LOGI(RX_TASK_TAG, "[UART DATA]: %d", event.size);
 				uart_read_bytes(EX_UART_NUM, dtmp, event.size, portMAX_DELAY);
 
-			//	printf("%s", dtmp);
+				//	printf("%s", dtmp);
 
 				if (dtmp[0] == '/') { // start of P1 message  /ISK5\2M550E-1013␍␍␊
 					dest = p1Buffer;
-				//	printf("\n**********************\n ");
+					//	printf("\n**********************\n ");
 					nrCharsInBuffer = event.size;
 					if (nrCharsInBuffer <= sizeof(p1Buffer)) {
 						memcpy(dest, dtmp, event.size);
 						dest += event.size;
-						state =1;
+						state = 1;
 						mssgsReceived++;
 					}
 				} else {
@@ -99,15 +100,24 @@ void uartRxTask(void *arg) {
 							dest += event.size;
 							nrCharsInBuffer += event.size;
 							if (p1Buffer[nrCharsInBuffer - 7] == '!') { // last block with CRC received
-								uint16_t crc = calculateCRC_CCITT((uint8_t *)p1Buffer, nrCharsInBuffer - 6);
-					//			printf("  CRC: %x ", crc);
+								uint16_t crc = calculateCRC_CCITT((uint8_t*) p1Buffer, nrCharsInBuffer - 6);
+								//			printf("  CRC: %x ", crc);
 								unsigned int receivedeCRC;
-								sscanf(&p1Buffer[nrCharsInBuffer-6],"%x", &receivedeCRC);
-								if ( crc == receivedeCRC)
-									parseP1data(p1Buffer,nrCharsInBuffer);
-								else {
+								sscanf(&p1Buffer[nrCharsInBuffer - 6], "%x", &receivedeCRC);
+								if (crc == receivedeCRC) {
+									parseP1data(p1Buffer, nrCharsInBuffer);
+									if ( connectStatus == IP_RECEIVED ) {
+										UDPsendMssg(5000, p1Buffer, nrCharsInBuffer);
+										sprintf(p1Buffer, " ** %d\n\r", nrCharsInBuffer);
+										UDPsendMssg(5000, p1Buffer, strlen(p1Buffer));
+									}
+								} else {
 									CRCerrors++;
-									printf("CRC errors: %d \n",CRCerrors);
+									if ( connectStatus == IP_RECEIVED ){
+										sprintf(p1Buffer, "CRC fout %d %d\n\r", CRCerrors,nrCharsInBuffer);
+										UDPsendMssg(5000, p1Buffer, strlen(p1Buffer));
+									}
+									printf("CRC errors: %d \n", CRCerrors);
 								}
 								state = 0;
 								nrCharsInBuffer = 0;
@@ -157,8 +167,6 @@ void uartRxTask(void *arg) {
 	dtmp = NULL;
 	vTaskDelete(NULL);
 }
-
-
 
 //extern "C" void app_main(void) {
 //	init();

@@ -5,17 +5,17 @@ dependencies:
       service_url: https://api.components.espressif.com/
       type: service
     version: 1.0.3
-  espressif__mdns:
-    component_hash: null
+  espressif/mdns:
+    component_hash: 810ec139689ae93bf42520d05de4855fbb68f7140ef67797d91d8d61829589cb
     source:
-      path: /mnt/linuxData/projecten/ESP32IDF5/p1Monitor/components/espressif__mdns
-      type: local
-    version: 1.2.0
+      service_url: https://api.components.espressif.com/
+      type: service
+    version: 1.2.2
   idf:
     component_hash: null
     source:
       type: idf
     version: 5.1.1
-manifest_hash: c45896b38559017d353facedcfcf2ec0267769833f2befbbd86b1f340f50dae3
+manifest_hash: 2ce92ca0bcadf7fd99f44d01fbdb3ee1f4214bacceac705c7472d835492e0d7d
 target: esp32
 version: 1.0.0
