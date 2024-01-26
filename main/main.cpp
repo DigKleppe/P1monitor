@@ -1,7 +1,7 @@
 /*
 
  . /home/dig/esp/esp-idf/export.sh
- idf.py monitor -p /dev/ttyUSB2
+ idf.py monitor -p /dev/ttyUSB2./export
 
  -s ${openocd_path}/share/openocd/scripts -f interface/ftdi/esp32_devkitj_v1.cfg -f target/esp32.cfg -c "program_esp /mnt/linuxData/projecten/git/thermostaat/SensirionSCD30/build//app.bin 0x10000 verify"
 
@@ -37,10 +37,12 @@
 #include "p1parser.h"
 
 #include "scripts.h"
+#include "updateTask.h"
+
 
 static const char *TAG = "main";
 
-//#define SIMULATE
+#define SIMULATE
 
 esp_err_t init_spiffs(void);
 
@@ -55,9 +57,8 @@ extern const char _3PhaseSimData[];
 extern "C" {
 void app_main() {
 	esp_err_t err;
-
 	bool toggle = false;
-
+	TaskHandle_t updateTaskh;
 
 	esp_rom_gpio_pad_select_gpio(LED_PIN);
 	gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
@@ -91,6 +92,8 @@ void app_main() {
 	} while (connectStatus != IP_RECEIVED);
 
 	gpio_set_level(LED_PIN, 0);
+
+	xTaskCreate(&updateTask, "updateTask",2* 8192, NULL, 5, &updateTaskh);
 
 	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 

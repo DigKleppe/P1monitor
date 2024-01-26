@@ -8,7 +8,7 @@
 #ifndef MAIN_INCLUDE_P1PARSER_H_
 #define MAIN_INCLUDE_P1PARSER_H_
 
-#define P1OUTDATASIZE 	512
+#define P1OUTDATASIZE 	1024
 
 
 typedef struct {

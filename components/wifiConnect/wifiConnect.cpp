@@ -1,12 +1,14 @@
+/**
+Connect starts wifi, tries to make contact with previous accesspoint.
+if the AP cannot be found smartConfig is invoked for SMARTCONFIGTIMEOUT seconds.
+without succes the process is contuously repeated
+Webserver is started
+DNS server is started ( name in sdkconfig )  website can be reached as eg http://esp32-mdns.local/
+todo make  things configurable in sdkconfig
 
-/* WiFi station Example
-
- This example code is in the Public Domain (or CC0 licensed, at your option.)
-
- Unless required by applicable law or agreed to in writing, this
- software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
- CONDITIONS OF ANY KIND, either express or implied.
+settings ssidd and pwd are stored in nvsFlash
  */
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -41,22 +43,19 @@ static void setStaticIp(esp_netif_t *netif);
 esp_err_t saveSettings(void);
 
 volatile  connectStatus_t connectStatus;
-
-#define EXAMPLE_ESP_WIFI_SSID      "xxx"
-#define EXAMPLE_ESP_WIFI_PASS      "yyy"
-
 wifiSettings_t wifiSettings;
-//wifiSettings_t wifiSettingsDefaults = { CONFIG_EXAMPLE_WIFI_SSID, CONFIG_EXAMPLE_WIFI_PASSWORD,ipaddr_addr(DEFAULT_IPADDRESS),ipaddr_addr(DEFAULT_GW),CONFIG_DEFAULT_FIRMWARE_UPGRADE_URL,CONFIG_FIRMWARE_UPGRADE_FILENAME,false  };
-wifiSettings_t wifiSettingsDefaults = { CONFIG_EXAMPLE_WIFI_SSID, CONFIG_EXAMPLE_WIFI_PASSWORD,ipaddr_addr(DEFAULT_IPADDRESS),ipaddr_addr(DEFAULT_GW)," "," ",false  };
 
-/* The examples use WiFi configuration that you can set via project configuration menu
+// @formatter:off
 
- If you'd rather not, just change the below entries to strings with
- the config you want - ie #define EXAMPLE_WIFI_SSID "mywifissid"
- */
+wifiSettings_t wifiSettingsDefaults = {
+		CONFIG_EXAMPLE_WIFI_SSID, CONFIG_EXAMPLE_WIFI_PASSWORD,ipaddr_addr(DEFAULT_IPADDRESS),
+		ipaddr_addr(DEFAULT_GW),CONFIG_DEFAULT_FIRMWARE_UPGRADE_SERVER,
+		CONFIG_DEFAULT_FIRMWARE_UPGRADE_URL,CONFIG_FIRMWARE_UPGRADE_FILENAME,"999","999"
+};
 
-#define EXAMPLE_ESP_MAXIMUM_RETRY  2
-#define EXAMPLE_H2E_IDENTIFIER 		""
+// @formatter:on
+
+#define EXAMPLE_ESP_MAXIMUM_RETRY  3
 #define CONFIG_ESP_WPA3_SAE_PWE_BOTH 1
 #define ESP_WIFI_SAE_MODE WPA3_SAE_PWE_BOTH
 #define CONFIG_ESP_WIFI_PW_ID	""
@@ -166,7 +165,6 @@ static void smartconfigTask(void * parm)
     }
 }
 
-
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data) {
 
 	if ( doStop)
@@ -238,7 +236,6 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 }
 
 void wifi_init_sta(void) {
-	bool connected = false;
 	connectStatus = CONNECTING;
 	s_wifi_event_group = xEventGroupCreate();
 
@@ -247,7 +244,6 @@ void wifi_init_sta(void) {
 	if ( !DNSoff)
 		initialiseMdns(userSettings.moduleName);
 
-//	ESP_ERROR_CHECK(esp_event_loop_create_default());  in main
 	s_sta_netif = esp_netif_create_default_wifi_sta();
 	if( DHCPoff)
       setStaticIp((esp_netif_t*) s_sta_netif);
@@ -262,20 +258,8 @@ void wifi_init_sta(void) {
 
 	ESP_ERROR_CHECK(esp_event_handler_register(SC_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
 
-	wifi_config_t wifi_config = {
-	.sta = {
-		.ssid = EXAMPLE_ESP_WIFI_SSID,
-		.password = EXAMPLE_ESP_WIFI_PASS,
-	/* Authmode threshold resets to WPA2 as default if password matches WPA2 standards (pasword len => 8).
-	 * If you want to connect the device to deprecated WEP/WPA networks, Please set the threshold value
-	 * to WIFI_AUTH_WEP/WIFI_AUTH_WPA_PSK and set the password with length and format matching to
-	 * WIFI_AUTH_WEP/WIFI_AUTH_WPA_PSK standards.
-	 */
-	//	.threshold.authmode = ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD,
-	//	.sae_pwe_h2e = ESP_WIFI_SAE_MODE,
-	//	.sae_h2e_identifier = EXAMPLE_H2E_IDENTIFIER,
-	},
-	};
+	wifi_config_t wifi_config;
+	bzero(&wifi_config, sizeof(wifi_config_t));
 
 	wifi_config.sta.threshold.authmode = ESP_WIFI_SCAN_AUTH_MODE_THRESHOLD;
 	wifi_config.sta.sae_pwe_h2e = ESP_WIFI_SAE_MODE;
