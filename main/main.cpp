@@ -42,7 +42,7 @@
 
 static const char *TAG = "main";
 
-#define SIMULATE
+
 
 esp_err_t init_spiffs(void);
 
@@ -94,11 +94,10 @@ void app_main() {
 	gpio_set_level(LED_PIN, 0);
 
 	xTaskCreate(&updateTask, "updateTask",2* 8192, NULL, 5, &updateTaskh);
-
 	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 
 	while (1) {
-		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		vTaskDelay(100 / portTICK_PERIOD_MS);
 		upTime++;
 #ifdef SIMULATE
 		parseP1data( (char *)_3PhaseSimData, strlen((char *)_3PhaseSimData));

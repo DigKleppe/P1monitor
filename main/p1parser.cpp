@@ -50,7 +50,7 @@
 #include "p1parser.h"
 #include <string.h>
 #include <stdio.h>
-#include "p1parser.h"
+
 #include "scripts.h"
 #include "log.h"
 #include "main.h"
@@ -64,6 +64,11 @@ char p1OutBuffer[P1OUTDATASIZE];
 log_t logValue;
 
 volatile bool newP1Data;
+
+#ifdef SIMULATE
+	int simValue = 100;
+	int m;
+#endif
 
 // @formatter:off
 p1Var_t p1VarTable[] = {
@@ -166,21 +171,38 @@ bool parseP1data(char *p1Buffer, int nrCharsInBuffer) {
 					break;
 
 				case 1: // Power used, set from kW to W
+#ifdef SIMULATE
+					simValue++;
+					p += sprintf(p, "%d W", simValue);
+					if ( simValue > 2000)
+						simValue = 50;
+					logValue.power += simValue; // add power of 3 phases ( if present)
+
+#else
 					len = sscanf(b + 1, "%f", &f);  // read kW
 					if (len) {
 						f *= 1000.0;
 						logValue.power += f; // add power of 3 phases ( if present)
 						p += sprintf(p, "%d W", (int) f);
 					}
+#endif
+
 					break;
 
 				case 2: // Power delivered, set from kW to W
 					len = sscanf(b + 1, "%f", &f);  // read kW
+
+#ifdef SIMULATE
+					simValue++;
+					p += sprintf(p, "%d W", simValue);
+					logValue.deliveredPower += simValue; // add power of 3 phases ( if present)
+#else
 					if (len) {
 						f *= 1000.0;
 						logValue.deliveredPower += f; // add power of 3 phases ( if present)
 						p += sprintf(p, "%d W", (int) f);
 					}
+#endif
 					break;
 
 				case 3:  // voltage

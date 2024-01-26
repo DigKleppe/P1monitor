@@ -17,7 +17,7 @@ typedef struct {
 	int function; // special function
 }p1Var_t;
 
-
+#define SIMULATE
 extern char p1OutBuffer[P1OUTDATASIZE];
 
 bool parseP1data(char * p1Buffer,int nrCharsInBuffer);

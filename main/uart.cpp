@@ -67,6 +67,7 @@ void uartRxTask(void *arg) {
 	uint8_t *dtmp = (uint8_t*) malloc(RX_BUF_SIZE + 1);
 	char *dest = p1Buffer;
 	uartInit();
+	int mssgCntr = 0;
 
 	for (;;) {
 		if (xQueueReceive(uart_queue, (void*) &event, (TickType_t) portMAX_DELAY)) {
@@ -108,7 +109,7 @@ void uartRxTask(void *arg) {
 									parseP1data(p1Buffer, nrCharsInBuffer);
 									if ( connectStatus == IP_RECEIVED ) {
 										UDPsendMssg(5000, p1Buffer, nrCharsInBuffer);
-										sprintf(p1Buffer, " ** %d\n\r", nrCharsInBuffer);
+										sprintf(p1Buffer, " ** %d %d\n\r", ++mssgCntr,  nrCharsInBuffer);
 										UDPsendMssg(5000, p1Buffer, strlen(p1Buffer));
 									}
 								} else {

@@ -23,9 +23,6 @@
 
 static const char *TAG = "updateTask";
 
-
-
-
 volatile updateStatus_t updateStatus;
 volatile bool getNewVersionTaskFinished;
 
@@ -180,8 +177,8 @@ void updateTask(void *pvParameter) {
 			} else
 				ESP_LOGI(TAG, "Update SPIFFS failed!");
 		}
-	//	vTaskDelay(CONFIG_CHECK_FIRMWARWE_UPDATE_INTERVAL / portTICK_PERIOD_MS);
-		vTaskDelay(10000 / portTICK_PERIOD_MS);
+		vTaskDelay(CONFIG_CHECK_FIRMWARWE_UPDATE_INTERVAL * 3600 * 1000 / portTICK_PERIOD_MS);
+	//	vTaskDelay(10000 / portTICK_PERIOD_MS);
 	}
 }
 
