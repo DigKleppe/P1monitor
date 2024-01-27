@@ -51,6 +51,8 @@ uint32_t stackWm[5];
 uint32_t upTime;
 
 void uartRxTask(void *arg);
+
+void uartTxTask(void *arg);
 extern const char _3PhaseSimData[];
 
 
@@ -96,12 +98,15 @@ void app_main() {
 	xTaskCreate(&updateTask, "updateTask",2* 8192, NULL, 5, &updateTaskh);
 	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 
-	while (1) {
-		vTaskDelay(100 / portTICK_PERIOD_MS);
-		upTime++;
-#ifdef SIMULATE
-		parseP1data( (char *)_3PhaseSimData, strlen((char *)_3PhaseSimData));
+
+#ifdef SIMULATE		//parseP1data( (char *)_3PhaseSimData, strlen((char *)_3PhaseSimData));
+	xTaskCreate(uartTxTask, "uartTxTask", 1024, NULL, configMAX_PRIORITIES-1, NULL);  // test only
 #endif
+
+	while (1) {
+
+		vTaskDelay(1000 / portTICK_PERIOD_MS);
+		upTime++;
 
 		if (connectStatus != IP_RECEIVED) {
 			toggle = !toggle;

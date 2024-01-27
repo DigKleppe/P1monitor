@@ -22,10 +22,8 @@
 static const int RX_BUF_SIZE = 2048;  // uart low level
 #define P1_BUF_SIZE			   2048   // result buffer
 
-#define TXD_PIN (GPIO_NUM_4)
-
-//#define RXD_PIN (GPIO_NUM_5)
-#define RXD_PIN (GPIO_NUM_17)
+#define TXD_PIN (GPIO_NUM_5)  // DC LCD
+#define RXD_PIN (GPIO_NUM_17) // nCS LCD
 #define EX_UART_NUM UART_NUM_1
 static QueueHandle_t uart_queue;
 
@@ -46,8 +44,10 @@ static void uartInit(void) {
     uart_driver_install(EX_UART_NUM, RX_BUF_SIZE * 2, 0, 5, &uart_queue, 0);
     uart_param_config(EX_UART_NUM, &uart_config);
     uart_set_pin(EX_UART_NUM, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+#ifndef SIMULATE
     uart_set_line_inverse(EX_UART_NUM, UART_SIGNAL_RXD_INV);
-
+#endif
+   // uart_set_line_inverse(EX_UART_NUM, UART_SIGNAL_TXD_INV); // ??
     const uart_intr_config_t  uartIntrConfig = {
    		.intr_enable_mask = UART_RXFIFO_TOUT_INT_ENA | UART_RXFIFO_FULL_INT_ENA,
 	    .rx_timeout_thresh = 10,
@@ -82,7 +82,7 @@ void uartRxTask(void *arg) {
 				//		ESP_LOGI(RX_TASK_TAG, "[UART DATA]: %d", event.size);
 				uart_read_bytes(EX_UART_NUM, dtmp, event.size, portMAX_DELAY);
 
-				//	printf("%s", dtmp);
+		//		printf("%s", dtmp);
 
 				if (dtmp[0] == '/') { // start of P1 message  /ISK5\2M550E-1013␍␍␊
 					dest = p1Buffer;
@@ -105,17 +105,23 @@ void uartRxTask(void *arg) {
 								//			printf("  CRC: %x ", crc);
 								unsigned int receivedeCRC;
 								sscanf(&p1Buffer[nrCharsInBuffer - 6], "%x", &receivedeCRC);
-								if (crc == receivedeCRC) {
+#ifdef SIMULATE
+								if( 1 ) {
+#else
+									if (crc == receivedeCRC) {
+#endif
 									parseP1data(p1Buffer, nrCharsInBuffer);
-									if ( connectStatus == IP_RECEIVED ) {
+									ESP_LOGI(RX_TASK_TAG, "Rec: %d  %d", mssgsReceived,nrCharsInBuffer);
+
+									if (connectStatus == IP_RECEIVED) {
 										UDPsendMssg(5000, p1Buffer, nrCharsInBuffer);
-										sprintf(p1Buffer, " ** %d %d\n\r", ++mssgCntr,  nrCharsInBuffer);
+										sprintf(p1Buffer, " ** %d %d\n\r", ++mssgCntr, nrCharsInBuffer);
 										UDPsendMssg(5000, p1Buffer, strlen(p1Buffer));
 									}
 								} else {
 									CRCerrors++;
-									if ( connectStatus == IP_RECEIVED ){
-										sprintf(p1Buffer, "CRC fout %d %d\n\r", CRCerrors,nrCharsInBuffer);
+									if (connectStatus == IP_RECEIVED) {
+										sprintf(p1Buffer, "CRC fout %d %d\n\r", CRCerrors, nrCharsInBuffer);
 										UDPsendMssg(5000, p1Buffer, strlen(p1Buffer));
 									}
 									printf("CRC errors: %d \n", CRCerrors);
@@ -133,7 +139,7 @@ void uartRxTask(void *arg) {
 				// If fifo overflow happened, you should consider adding flow control for your application.
 				// The ISR has already reset the rx FIFO,
 				// As an example, we directly flush the rx buffer here in order to read more data.
-				uart_flush_input(EX_UART_NUM);
+				uart_flush_input (EX_UART_NUM);
 				xQueueReset(uart_queue);
 				break;
 				//Event of UART ring buffer full
@@ -166,15 +172,18 @@ void uartRxTask(void *arg) {
 	}
 	free(dtmp);
 	dtmp = NULL;
-	vTaskDelete(NULL);
+	vTaskDelete (NULL);
 }
 
-//extern "C" void app_main(void) {
-//	init();
-//	xTaskCreate(rx_task, "uart_rx_task", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
-////	while(1)
-////		parseP1data("1-0:99.97.0(2)(0-0:96.7.19)(210827121443S)(0000010761*s)(210827131420S)(0000000326*s)\r\n", 99);
-//	//	parseP1data("1-0:31.7.0(000*A)"\r\n", 99);
-//
-//}
+// test only
+extern "C" const char _3PhaseSimData[];
+void uartTxTask(void *arg)
+{
+	int len = strlen(_3PhaseSimData);
+	while (1) {
+		uart_write_bytes(EX_UART_NUM, (const char *) _3PhaseSimData, len);
+		vTaskDelay( 1000/portTICK_PERIOD_MS);
+	}
+}
+
 

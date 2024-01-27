@@ -121,65 +121,66 @@ void updateTask(void *pvParameter) {
 	ESP_LOGI(TAG, "Running partition type %d subtype %d (offset 0x%08"PRIx32")", running->type, running->subtype, running->address);
 
 	while (1) {
-		doUpdate = false;
-		getNewVersion(BINARY_INFO_FILENAME, newVersion);
-		if (newVersion[0] != 0) {
-			if (strcmp(newVersion, wifiSettings.firmwareVersion) != 0) {
-				ESP_LOGI(TAG, "New firmware version available: %s", newVersion);
-				doUpdate = true;
+		if (connectStatus == IP_RECEIVED) {  // only check when connectes
+			doUpdate = false;
+			getNewVersion(BINARY_INFO_FILENAME, newVersion);
+			if (newVersion[0] != 0) {
+				if (strcmp(newVersion, wifiSettings.firmwareVersion) != 0) {
+					ESP_LOGI(TAG, "New firmware version available: %s", newVersion);
+					doUpdate = true;
+				} else
+					ESP_LOGI(TAG, "Firmware up to date: %s", newVersion);
 			} else
-				ESP_LOGI(TAG, "Firmware up to date: %s", newVersion);
-		} else
-			ESP_LOGI(TAG, "Reading New firmware info failed");
+				ESP_LOGI(TAG, "Reading New firmware info failed");
 
-		if (doUpdate) {
-			ESP_LOGI(TAG, "Updating firmware to version: %s", newVersion);
-			xTaskCreate(&updateFirmwareTask, "updateFirmwareTask", 2 * 8192, NULL, 5, &updateFWTaskh);
-			vTaskDelay(100 / portTICK_PERIOD_MS);
-			while (updateStatus == UPDATE_BUSY)
+			if (doUpdate) {
+				ESP_LOGI(TAG, "Updating firmware to version: %s", newVersion);
+				xTaskCreate(&updateFirmwareTask, "updateFirmwareTask", 2 * 8192, NULL, 5, &updateFWTaskh);
 				vTaskDelay(100 / portTICK_PERIOD_MS);
+				while (updateStatus == UPDATE_BUSY)
+					vTaskDelay(100 / portTICK_PERIOD_MS);
 
-			if (updateStatus == UPDATE_RDY) {
-				strcpy(wifiSettings.firmwareVersion, newVersion);
-				saveSettings();
-				ESP_LOGI(TAG, "Update successfull, restarting system!");
-				vTaskDelay(100 / portTICK_PERIOD_MS);
-				esp_restart();
-			} else
-				ESP_LOGI(TAG, "Update firmware failed!");
-		}
+				if (updateStatus == UPDATE_RDY) {
+					strcpy(wifiSettings.firmwareVersion, newVersion);
+					saveSettings();
+					ESP_LOGI(TAG, "Update successfull, restarting system!");
+					vTaskDelay(100 / portTICK_PERIOD_MS);
+					esp_restart();
+				} else
+					ESP_LOGI(TAG, "Update firmware failed!");
+			}
 
 // ********************* SPIFFS update ***************************
 
-		doUpdate = false;
-		getNewVersion(SPIFFS_INFO_FILENAME, newVersion);
-		if (newVersion[0] != 0) {
-			if (strcmp(newVersion, wifiSettings.SPIFFSversion) != 0) {
-				ESP_LOGI(TAG, "New SPIFFS version available: %s", newVersion);
-				doUpdate = true;
+			doUpdate = false;
+			getNewVersion(SPIFFS_INFO_FILENAME, newVersion);
+			if (newVersion[0] != 0) {
+				if (strcmp(newVersion, wifiSettings.SPIFFSversion) != 0) {
+					ESP_LOGI(TAG, "New SPIFFS version available: %s", newVersion);
+					doUpdate = true;
+				} else
+					ESP_LOGI(TAG, "SPIFFS up to date: %s", newVersion);
 			} else
-				ESP_LOGI(TAG, "SPIFFS up to date: %s", newVersion);
-		} else
-			ESP_LOGI(TAG, "Reading New SPIFFS info failed");
+				ESP_LOGI(TAG, "Reading New SPIFFS info failed");
 
-		if (doUpdate) {
-			ESP_LOGI(TAG, "Updating SPIFFS to version: %s", newVersion);
-			xTaskCreate(&updateSpiffsTask, "updateSpiffsTask", 2 * 8192, NULL, 5, &updateSPIFFSTaskh);
-			vTaskDelay(100 / portTICK_PERIOD_MS);
-
-			while (updateStatus == UPDATE_BUSY) // wait for task to finish
+			if (doUpdate) {
+				ESP_LOGI(TAG, "Updating SPIFFS to version: %s", newVersion);
+				xTaskCreate(&updateSpiffsTask, "updateSpiffsTask", 2 * 8192, NULL, 5, &updateSPIFFSTaskh);
 				vTaskDelay(100 / portTICK_PERIOD_MS);
 
-			if (updateStatus == UPDATE_RDY) {
-				ESP_LOGI(TAG, "SPIFFS flashed OK");
-				strcpy(wifiSettings.SPIFFSversion, newVersion);
-				saveSettings();
-			} else
-				ESP_LOGI(TAG, "Update SPIFFS failed!");
-		}
-		vTaskDelay(CONFIG_CHECK_FIRMWARWE_UPDATE_INTERVAL * 3600 * 1000 / portTICK_PERIOD_MS);
-	//	vTaskDelay(10000 / portTICK_PERIOD_MS);
+				while (updateStatus == UPDATE_BUSY) // wait for task to finish
+					vTaskDelay(100 / portTICK_PERIOD_MS);
+
+				if (updateStatus == UPDATE_RDY) {
+					ESP_LOGI(TAG, "SPIFFS flashed OK");
+					strcpy(wifiSettings.SPIFFSversion, newVersion);
+					saveSettings();
+				} else
+					ESP_LOGI(TAG, "Update SPIFFS failed!");
+			}
+			vTaskDelay(CONFIG_CHECK_FIRMWARWE_UPDATE_INTERVAL * 3600 * 1000 / portTICK_PERIOD_MS);
+		} else
+			vTaskDelay(1000 / portTICK_PERIOD_MS);
 	}
 }
-
 

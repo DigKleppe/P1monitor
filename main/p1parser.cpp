@@ -65,6 +65,8 @@ log_t logValue;
 
 volatile bool newP1Data;
 
+
+
 #ifdef SIMULATE
 	int simValue = 100;
 	int m;
@@ -90,7 +92,7 @@ p1Var_t p1VarTable[] = {
 	{ "1-0:2.8.2", 	"Geleverde energie tarief 2",0 },
 	{ "0-0:96.7.21","Korte onderbrekingen",0},
 	{ "0-0:96.7.9", "Lange onderbrekingen",0 },
-	{ "1-0:99.97.0","Onderbrekingslog",4 },
+//	{ "1-0:99.97.0","Onderbrekingslog",4 },
 	{ "", "",0 },
 #endif
 
