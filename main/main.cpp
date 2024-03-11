@@ -65,8 +65,12 @@ void app_main() {
 	esp_rom_gpio_pad_select_gpio(LED_PIN);
 	gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 	gpio_set_drive_capability(LED_PIN, GPIO_DRIVE_CAP_0);
-
 	gpio_set_level(LED_PIN, 0);
+
+	esp_rom_gpio_pad_select_gpio(LED_INV_PIN);
+	gpio_set_direction(LED_INV_PIN, GPIO_MODE_OUTPUT);
+	gpio_set_drive_capability(LED_INV_PIN, GPIO_DRIVE_CAP_0);
+	gpio_set_level(LED_PIN, 1);
 
 	ESP_ERROR_CHECK(esp_event_loop_create_default());
 
@@ -90,10 +94,12 @@ void app_main() {
 	do {
 		toggle = !toggle;
 		gpio_set_level(LED_PIN, toggle);
+		gpio_set_level(LED_INV_PIN, !toggle);
 		vTaskDelay(500 / portTICK_PERIOD_MS);
 	} while (connectStatus != IP_RECEIVED);
 
 	gpio_set_level(LED_PIN, 0);
+	gpio_set_level(LED_INV_PIN, 1);
 
 	xTaskCreate(&updateTask, "updateTask",2* 8192, NULL, 5, &updateTaskh);
 	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
@@ -111,6 +117,7 @@ void app_main() {
 		if (connectStatus != IP_RECEIVED) {
 			toggle = !toggle;
 			gpio_set_level(LED_PIN, toggle);
+			gpio_set_level(LED_INV_PIN, !toggle);
 		} else {
 		//	gpio_set_level(LED_PIN, false);
 

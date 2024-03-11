@@ -260,9 +260,10 @@ bool parseP1data(char *p1Buffer, int nrCharsInBuffer) {
 	newP1Data = true;
 	addToLog(logValue);
 	gpio_set_level(LED_PIN, true);
+	gpio_set_level(LED_INV_PIN, false);
 	vTaskDelay(20 / portTICK_PERIOD_MS);
 	gpio_set_level(LED_PIN, false);
-
+	gpio_set_level(LED_INV_PIN, true);
 	return false;
 }
 
