@@ -12,23 +12,23 @@ dependencies:
       type: service
     version: 0.6.0~1
   espressif/esp-dsp:
-    component_hash: 8d9864049f97e4a1e7daafb4536b62b0878efa990a61048a91fab9b7c1b5b4cd
+    component_hash: 3e7bbd487f1357a1d4944d0c85966d049501ea281b8a4c7f93f7cfedd5b7f23d
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.4.11
+    version: 1.4.12
   espressif/esp-zboss-lib:
-    component_hash: 5293786c3232bcc200c2e34aeef515ab0564dccda2e8c2613b0bb6b0a6f819a7
+    component_hash: dad55dcf4e9e05892d75c833f621d0421b6b6657c5078fd9cfb2da9a496f9a91
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.2.0
+    version: 1.2.1
   espressif/esp-zigbee-lib:
-    component_hash: d9c2e20058b1cd5cc31e9399cf7b939f80e000b3088f9895ba806b4b2217994a
+    component_hash: 3485a92e8eddeb47dc80ab14e771ea7ae70cdfe72ce1c11216c7df51e4774b2e
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.2.0
+    version: 1.2.1
   espressif/esp_diag_data_store:
     component_hash: 8849195251dbb8a2d7268335277cfa310cef36e4ac1e90cd59ad3be4269a30d7
     source:
@@ -54,11 +54,11 @@ dependencies:
       type: service
     version: 1.1.0
   espressif/esp_schedule:
-    component_hash: 2cbc7e2584f523d10fbfb4ecb7d25c07fa7d7757ab23d7a127494b1a58131ffe
+    component_hash: 80d3694717a537156f61a072dfe1d1498a2a4f32819a5735bf8a50bcadf79941
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 1.1.0
+    version: 1.1.1
   espressif/esp_secure_cert_mgr:
     component_hash: a20007d67e65a000670ab77e45d7554c943eb8dcb0abeada0a57dd9adac3a703
     source:
@@ -112,6 +112,6 @@ dependencies:
       service_url: https://api.components.espressif.com/
       type: service
     version: 1.14.2
-manifest_hash: 551269d83c602d4f4729f3647015e044c3e783a4e7208c9a3486710713ddf889
+manifest_hash: 63f246ca4b61e10c7e8263b4fa7c23638784be3c1cd136098067212b6223faea
 target: esp32
 version: 1.0.0
