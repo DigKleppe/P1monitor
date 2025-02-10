@@ -22,8 +22,11 @@
 static const int RX_BUF_SIZE = 2048;  // uart low level
 #define P1_BUF_SIZE			   2048   // result buffer
 
-#define TXD_PIN (GPIO_NUM_5)  // DC LCD
-#define RXD_PIN (GPIO_NUM_17) // nCS LCD
+#define TXD_PIN (GPIO_NUM_5)  // not used
+#define RXD_PIN (GPIO_NUM_17) 
+#define UART_INVERTED	true
+
+
 #define EX_UART_NUM UART_NUM_1
 static QueueHandle_t uart_queue;
 
