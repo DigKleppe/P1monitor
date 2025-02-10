@@ -1,0 +1,10 @@
+{
+    "idf.espIdfPath": "/home/dig/programmas/esp32/v5.4/esp-idf",
+<<<<<<< HEAD
+    "idf.toolsPath": "/home/dig/.espressif"
+=======
+    "idf.toolsPath": "/home/dig/.espressif",
+    "idf.flashType": "UART",
+    "idf.port": "/dev/ttyUSB0"
+>>>>>>> OTA
+}
