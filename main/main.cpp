@@ -100,8 +100,10 @@ void app_main() {
 
 	gpio_set_level(LED_PIN, 0);
 	gpio_set_level(LED_INV_PIN, 1);
-
+#ifndef MYBOARD 
 	xTaskCreate(&updateTask, "updateTask",2* 8192, NULL, 5, &updateTaskh);
+#endif
+
 	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
 
 

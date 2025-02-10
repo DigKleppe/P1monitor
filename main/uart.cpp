@@ -18,14 +18,21 @@
 #include "p1parser.h"
 #include "udpClient.h"
 #include "wifiConnect.h"
+#include "main.h"
 
 static const int RX_BUF_SIZE = 2048;  // uart low level
 #define P1_BUF_SIZE			   2048   // result buffer
 
 #define TXD_PIN (GPIO_NUM_5)  // not used
+
+#ifdef MYBOARD
+#warning "MYBOARD!"
+#define RXD_PIN (GPIO_NUM_16) 
+#define UART_INVERTED	false
+#else
 #define RXD_PIN (GPIO_NUM_17) 
 #define UART_INVERTED	true
-
+#endif
 
 #define EX_UART_NUM UART_NUM_1
 static QueueHandle_t uart_queue;
@@ -48,7 +55,9 @@ static void uartInit(void) {
     uart_param_config(EX_UART_NUM, &uart_config);
     uart_set_pin(EX_UART_NUM, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 #ifndef SIMULATE
-    uart_set_line_inverse(EX_UART_NUM, UART_SIGNAL_RXD_INV);
+	#ifndef MYBOARD
+    uart_set_line_inverse(EX_UART_NUM, UART_SIGNAL_RXD_INV);  
+	#endif
 #endif
    // uart_set_line_inverse(EX_UART_NUM, UART_SIGNAL_TXD_INV); // ??
     const uart_intr_config_t  uartIntrConfig = {
