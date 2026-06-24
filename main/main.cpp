@@ -104,7 +104,7 @@ void app_main() {
 	xTaskCreate(&updateTask, "updateTask",2* 8192, NULL, 5, &updateTaskh);
 #endif
 
-	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES, NULL);
+	xTaskCreate(uartRxTask, "uartRxTask", 1024 * 3, NULL, configMAX_PRIORITIES-1, NULL);
 
 
 #ifdef SIMULATE		//parseP1data( (char *)_3PhaseSimData, strlen((char *)_3PhaseSimData));

@@ -16,7 +16,7 @@
 #include "cgiScripts.h"
 
 #define MAX_STRLEN				 32
-#define USERSETTINGS_CHECKSTR 	"test123"
+#define USERSETTINGS_CHECKSTR 	"12345"
 
 
 typedef struct {

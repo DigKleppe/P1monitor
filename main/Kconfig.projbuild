@@ -1,4 +1,4 @@
-menu "Example Connection Configuration"
+menu "Connection Configuration"
 
     config EXAMPLE_GPIO_RANGE_MIN
         int
@@ -32,6 +32,55 @@ menu "Example Connection Configuration"
                 WiFi password (WPA or WPA2) for the example to use.
                 Can be left blank if the network has no security set.
 
+        config WPS_ENABLED
+          bool "enable WPS"
+          default y
+             
+        if WPS_ENABLED
+            config EXAMPLE_WPS_PIN
+                string "WPS PIN"
+                default "0123456789"
+                help
+                WPS PINcode to use.
+                This is only used when WPS is enabled and the PIN method is selected.
+            
+            config WPS_TIMEOUT
+                int "WPS timeout"
+                range 0 120
+                default 60
+                help
+                WPS timeout in seconds.
+            
+           choice EXAMPLE_WPS_TYPE
+                prompt "WPS mode"
+                default EXAMPLE_WPS_TYPE_PBC
+                help
+                    WPS type for the esp32 to use.
+                config EXAMPLE_WPS_TYPE_PBC
+                    bool "PBC"
+                config EXAMPLE_WPS_TYPE_PIN
+                     bool "PIN"
+               config EXAMPLE_WPS_TYPE_DISABLE
+                     bool "disable"
+            endchoice
+        endif # WPS_ENABLED
+        
+       config SMARTCONFIG_ENABLED
+            bool "enable SmartConfig"
+            default n
+            help
+            Enable SmartConfig support.
+            Smartconfig is started if no connection can be made.
+
+       if SMARTCONFIG_ENABLED
+            config SMARTCONFIG_TIMEOUT
+                int "smartconfing timeout"
+                range 0 120
+                default 20
+                help
+                Smartconfig timeout in seconds.
+       endif # SMARTCONFIG_ENABLED
+
         choice EXAMPLE_WIFI_SCAN_METHOD
             prompt "WiFi Scan Method"
             default EXAMPLE_WIFI_SCAN_METHOD_ALL_CHANNEL
@@ -47,6 +96,8 @@ menu "Example Connection Configuration"
             config EXAMPLE_WIFI_SCAN_METHOD_ALL_CHANNEL
                 bool "All Channel"
         endchoice
+    
+
 
         menu "WiFi Scan threshold"
             config EXAMPLE_WIFI_SCAN_RSSI_THRESHOLD
@@ -82,6 +133,9 @@ menu "Example Connection Configuration"
                 config EXAMPLE_WIFI_AUTH_WAPI_PSK
                     bool "WAPI PSK"
             endchoice
+
+        
+
         endmenu
 
         choice EXAMPLE_WIFI_CONNECT_AP_SORT_METHOD
@@ -99,7 +153,9 @@ menu "Example Connection Configuration"
             config EXAMPLE_WIFI_CONNECT_AP_BY_SECURITY
                 bool "Security"
         endchoice
-    endif
+
+ 
+    endif # EXAMPLE_CONNECT_WIFI
 
     config EXAMPLE_CONNECT_ETHERNET
         bool "connect using Ethernet interface"
@@ -319,7 +375,7 @@ menu "Example Connection Configuration"
     endif
 endmenu
 
-menu "Example mdns Configuration"
+menu "Mdns Configuration"
 
     config MDNS_HOSTNAME
         string "mDNS Hostname"

@@ -44,7 +44,7 @@ const static char http_html_hdr[] = "HTTP/1.1 200 OK\nContent-type: text/html\n\
 int readDescriptors(char *pBuffer, int count);
 // @formatter:off
 // do not alter
-static const tCGI CGIurls[NUM_CGIurls] = {
+const tCGI CGIurls[NUM_CGIurls] = {
 		{ "/cgi-bin/readvar", (tCGIHandler_t) readCGIvalues, (CGIresponseFileHandler_t) readVarScript },  // !!!!!! index  !!
 		{ "/cgi-bin/writevar", (tCGIHandler_t) readCGIvalues, (CGIresponseFileHandler_t) readVarScript },  // !!!!!! index  !!
 		{ "/action_page.php", (tCGIHandler_t) readCGIvalues,(CGIresponseFileHandler_t) actionRespScript },
