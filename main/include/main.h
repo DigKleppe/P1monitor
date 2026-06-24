@@ -11,7 +11,7 @@
 #define _3PHASE
 #define SOLARPANELS
 
-#define MYBOARD  // for zeeuwind board
+//#define MYBOARD  // for zeeuwind board
 
 
 
